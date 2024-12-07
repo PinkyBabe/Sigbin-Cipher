@@ -123,13 +123,14 @@
         const caesarEncrypted = caesarEncrypt(reversedWord, shift);
 
         // Step 3: Add word length
-        return caesarEncrypted + '.' + caesarEncrypted.length;
-      }).join(' ').replace(/\s/g, '.'); // Replace spaces with dots
+        return caesarEncrypted + caesarEncrypted.length; // No dot between word and length
+      }).join(' '); // Separate words by spaces
     }
 
     function sigbinDecrypt(text, shift) {
       const words = text.split(' ').map(word => {
-        const [encryptedWord, length] = word.split('.');
+        const wordLength = word.length;
+        const encryptedWord = word.substring(0, wordLength - 1); // Remove length at the end
 
         // Step 1: Apply Caesar decryption
         const caesarDecrypted = caesarDecrypt(encryptedWord, shift);
