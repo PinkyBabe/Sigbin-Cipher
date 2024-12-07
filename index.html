@@ -88,8 +88,7 @@
   <div class="container" id="mainContainer">
     <h1>Welcome to the Encryption Tool</h1>
     <p>Select a cipher:</p>
-    <button class="btn" onclick="startCaesar()">Caesar Cipher</button>
-    <button class="btn" onclick="startSigbin()">Sigbin Cipher</button>
+    <button class="btn" onclick="startSigbinCaesar()">Sigbin Caesar Cipher</button>
   </div>
 
   <script>
@@ -103,94 +102,82 @@
       return char; // Non-alphabet characters remain unchanged
     }
 
-    function encryptCaesar() {
+    // Sigbin Caesar Cipher Functions
+    function encryptSigbinCaesar() {
       const inputText = document.getElementById('inputText').value;
       const shiftKey = parseInt(document.getElementById('shiftKey').value);
-      let encryptedText = '';
+
+      // Step 1: Caesar Cipher Encryption (First pass)
+      let caesarEncrypted = '';
       for (let char of inputText) {
-        encryptedText += caesarShiftChar(char, shiftKey);
+        caesarEncrypted += caesarShiftChar(char, shiftKey);
       }
-      document.getElementById('outputText').value = encryptedText;
-    }
 
-    function decryptCaesar() {
-      const encryptedText = document.getElementById('outputText').value;
-      const shiftKey = parseInt(document.getElementById('shiftKey').value);
-      let decryptedText = '';
-      for (let char of encryptedText) {
-        decryptedText += caesarShiftChar(char, -shiftKey);
-      }
-      document.getElementById('outputText').value = decryptedText;
-    }
-
-    // Sigbin Cipher Functions (Reverse and Caesar with Word Length)
-    function encryptSigbin() {
-      const inputText = document.getElementById('inputText').value;
-      const shiftKey = parseInt(document.getElementById('shiftKey').value);
-      let encryptedText = '';
-
-      const words = inputText.split(' ');
+      // Step 2: Sigbin Cipher (Reverse words and apply Caesar Shift)
+      let sigbinEncrypted = '';
+      const words = caesarEncrypted.split(' ');
       words.forEach(word => {
-        const reversedWord = word.split('').reverse().join('');
+        const reversedWord = word.split('').reverse().join(''); // Reverse the word
         let encryptedWord = '';
         for (let char of reversedWord) {
-          encryptedWord += caesarShiftChar(char, shiftKey);
+          encryptedWord += caesarShiftChar(char, shiftKey); // Apply Caesar shift again
         }
-        encryptedWord += reversedWord.length; // Append word length
-        encryptedText += encryptedWord + ' '; // Ensure word boundaries
+        encryptedWord += reversedWord.length; // Append the word length
+        sigbinEncrypted += encryptedWord + '.'; // Separate words with a dot
       });
 
-      document.getElementById('outputText').value = encryptedText.trim();
+      // Step 3: Final Caesar Cipher Encryption (Second pass)
+      let finalEncryptedText = '';
+      for (let char of sigbinEncrypted) {
+        finalEncryptedText += caesarShiftChar(char, shiftKey);
+      }
+
+      document.getElementById('outputText').value = finalEncryptedText.slice(0, -1); // Remove trailing dot
     }
 
-    function decryptSigbin() {
+    function decryptSigbinCaesar() {
       const encryptedText = document.getElementById('outputText').value;
       const shiftKey = parseInt(document.getElementById('shiftKey').value);
-      let decryptedText = '';
 
-      const words = encryptedText.split(' ');
+      // Step 1: Reverse Caesar Cipher Encryption (First pass)
+      let reversedCaesarEncrypted = '';
+      for (let char of encryptedText) {
+        reversedCaesarEncrypted += caesarShiftChar(char, -shiftKey);
+      }
+
+      // Step 2: Reverse the Sigbin Cipher (Remove word length and reverse words)
+      let sigbinDecrypted = '';
+      const words = reversedCaesarEncrypted.split('.');
       words.forEach(word => {
         const length = parseInt(word.slice(-1)); // Extract word length
         let decryptedWord = '';
         for (let char of word.slice(0, -1)) {
-          decryptedWord += caesarShiftChar(char, -shiftKey);
+          decryptedWord += caesarShiftChar(char, -shiftKey); // Reverse Caesar shift
         }
-        decryptedText += decryptedWord.slice(-length).split('').reverse().join('') + ' ';
+        sigbinDecrypted += decryptedWord.slice(-length).split('').reverse().join('') + ' '; // Reverse and trim to word length
       });
 
-      document.getElementById('outputText').value = decryptedText.trim();
+      // Step 3: Final Caesar Cipher Decryption (Second pass)
+      let finalDecryptedText = '';
+      for (let char of sigbinDecrypted.trim()) {
+        finalDecryptedText += caesarShiftChar(char, -shiftKey);
+      }
+
+      document.getElementById('outputText').value = finalDecryptedText;
     }
 
-    // Initialization for each cipher
-    function startCaesar() {
+    // Sigbin Caesar Level Initialization
+    function startSigbinCaesar() {
       document.getElementById('mainContainer').innerHTML = `
-        <h1>Caesar Cipher</h1>
+        <h1>Sigbin Caesar Cipher</h1>
         <label for="inputText">Enter Text:</label>
-        <textarea id="inputText" placeholder="Enter your text here..." oninput="decryptText()"></textarea>
+        <textarea id="inputText" placeholder="Enter your text here..."></textarea>
 
         <label for="shiftKey">Shift Key:</label>
-        <input type="number" id="shiftKey" value="3" oninput="decryptText()" />
+        <input type="number" id="shiftKey" value="3" />
 
-        <button class="btn" onclick="encryptCaesar()">Encrypt</button>
-        <button class="btn" onclick="decryptCaesar()">Decrypt</button>
-        <button class="btn back" onclick="goBack()">Back to Selection</button>
-
-        <h2>Result</h2>
-        <textarea id="outputText" readonly></textarea>
-      `;
-    }
-
-    function startSigbin() {
-      document.getElementById('mainContainer').innerHTML = `
-        <h1>Sigbin Cipher</h1>
-        <label for="inputText">Enter Text:</label>
-        <textarea id="inputText" placeholder="Enter your text here..." oninput="decryptText()"></textarea>
-
-        <label for="shiftKey">Shift Key:</label>
-        <input type="number" id="shiftKey" value="3" oninput="decryptText()" />
-
-        <button class="btn" onclick="encryptSigbin()">Encrypt</button>
-        <button class="btn" onclick="decryptSigbin()">Decrypt</button>
+        <button class="btn" onclick="encryptSigbinCaesar()">Encrypt</button>
+        <button class="btn" onclick="decryptSigbinCaesar()">Decrypt</button>
         <button class="btn back" onclick="goBack()">Back to Selection</button>
 
         <h2>Result</h2>
@@ -202,8 +189,7 @@
       document.getElementById('mainContainer').innerHTML = `
         <h1>Welcome to the Encryption Tool</h1>
         <p>Select a cipher:</p>
-        <button class="btn" onclick="startCaesar()">Caesar Cipher</button>
-        <button class="btn" onclick="startSigbin()">Sigbin Cipher</button>
+        <button class="btn" onclick="startSigbinCaesar()">Sigbin Caesar Cipher</button>
       `;
     }
   </script>
