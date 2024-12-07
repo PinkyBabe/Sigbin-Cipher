@@ -138,10 +138,10 @@
         for (let char of reversedWord) {
           encryptedWord += caesarShiftChar(char, shiftKey);
         }
-        encryptedText += encryptedWord + '.';
+        encryptedText += encryptedWord + ' '; // Ensure word boundaries
       });
 
-      document.getElementById('outputText').value = encryptedText.slice(0, -1);
+      document.getElementById('outputText').value = encryptedText.trim();
     }
 
     function decryptSigbin() {
@@ -149,7 +149,7 @@
       const shiftKey = parseInt(document.getElementById('shiftKey').value);
       let decryptedText = '';
 
-      const words = encryptedText.split('.');
+      const words = encryptedText.split(' ');
       words.forEach(word => {
         let decryptedWord = '';
         for (let char of word) {
@@ -165,9 +165,9 @@
     function encryptSigbinCaesar() {
       const inputText = document.getElementById('inputText').value;
       const shiftKey = parseInt(document.getElementById('shiftKey').value);
-      let caesarEncrypted = '';
 
       // Step 1: Caesar Cipher Encryption
+      let caesarEncrypted = '';
       for (let char of inputText) {
         caesarEncrypted += caesarShiftChar(char, shiftKey);
       }
@@ -187,9 +187,9 @@
     function decryptSigbinCaesar() {
       const encryptedText = document.getElementById('outputText').value;
       const shiftKey = parseInt(document.getElementById('shiftKey').value);
-      let caesarDecrypted = '';
 
       // Step 1: Reverse Caesar Cipher (apply negative shift)
+      let caesarDecrypted = '';
       for (let char of encryptedText) {
         caesarDecrypted += caesarShiftChar(char, -shiftKey);
       }
