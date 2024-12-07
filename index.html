@@ -187,18 +187,18 @@
 
   // Step 3: Sigbin Cipher Encryption
   let sigbinEncrypted = '';
-  const words = playfairEncrypted.split(' ');
+  const words = playfairEncrypted.split(' '); // Split into words
   words.forEach(word => {
-    const reversedWord = word.split('').reverse().join('');
+    const reversedWord = word.split('').reverse().join(''); // Reverse word
     let encryptedWord = '';
     for (let char of reversedWord) {
-      encryptedWord += caesarShiftChar(char, shiftKey);
+      encryptedWord += caesarShiftChar(char, shiftKey); // Caesar-shift each character
     }
-    encryptedWord += reversedWord.length;
-    sigbinEncrypted += encryptedWord + '.';
+    encryptedWord += reversedWord.length; // Append word length
+    sigbinEncrypted += encryptedWord + '.'; // Add dot separator
   });
 
-  document.getElementById('outputText').value = sigbinEncrypted.slice(0, -1);
+  document.getElementById('outputText').value = sigbinEncrypted.slice(0, -1); // Remove trailing dot
 }
 
 function decryptHard() {
@@ -208,14 +208,14 @@ function decryptHard() {
 
   // Step 1: Sigbin Cipher Decryption
   let sigbinDecrypted = '';
-  const words = encryptedText.split('.');
+  const words = encryptedText.split('.'); // Split by dots
   words.forEach(word => {
-    const length = parseInt(word.slice(-1));
+    const length = parseInt(word.slice(-1)); // Extract word length
     let decryptedWord = '';
     for (let char of word.slice(0, -1)) {
-      decryptedWord += caesarShiftChar(char, -shiftKey);
+      decryptedWord += caesarShiftChar(char, -shiftKey); // Reverse Caesar shift
     }
-    sigbinDecrypted += decryptedWord.slice(-length).split('').reverse().join('') + ' ';
+    sigbinDecrypted += decryptedWord.slice(-length).split('').reverse().join('') + ' '; // Reverse word and trim
   });
 
   // Step 2: Playfair Cipher Decryption
