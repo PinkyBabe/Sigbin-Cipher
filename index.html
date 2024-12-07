@@ -3,119 +3,192 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Caesar Cipher Encryption</title>
+  <title>Encryption Selector</title>
   <style>
     body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-}
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
 
-.container {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  max-width: 500px;
-  width: 100%;
-}
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 100%;
+    }
 
-h1 {
-  text-align: center;
-}
+    h1, h2 {
+      text-align: center;
+    }
 
-textarea {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
+    button {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      margin: 5px 0;
+    }
 
-button {
-  background-color: #007bff;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  width: 100%;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-label {
-  font-weight: bold;
-}
+    button:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Caesar Cipher Encryption</h1>
-    
-    <label for="inputText">Enter Text:</label>
-    <textarea id="inputText" placeholder="Enter your text here..."></textarea>
-
-    <label for="shiftKey">Shift Key:</label>
-    <input type="number" id="shiftKey" value="3" />
-
-    <button onclick="encryptText()">Encrypt</button>
-
-    <h2>Encrypted Text</h2>
-    <textarea id="outputText" readonly></textarea>
+  <div class="container" id="mainContainer">
+    <h1>Select Difficulty</h1>
+    <button onclick="startEasy()">Easy Encryption</button>
+    <button onclick="startHard()">Hard Encryption</button>
   </div>
 
   <script>
-       function caesarShiftChar(char, shift) {
-  const charCode = char.charCodeAt(0);
+    // Function to render Easy Encryption UI
+    function startEasy() {
+      document.getElementById('mainContainer').innerHTML = `
+        <h1>Easy Encryption</h1>
+        <label for="inputText">Enter Text:</label>
+        <textarea id="inputText" placeholder="Enter your text here..."></textarea>
 
-  // Check if it's a letter
-  if (char.toLowerCase() !== char.toUpperCase()) {
-    const base = char.toLowerCase() === char ? 97 : 65; // ASCII for 'a' or 'A'
-    return String.fromCharCode(((charCode - base + shift) % 26 + 26) % 26 + base);
-  }
-  
-  // If it's not a letter, return the character unchanged
-  return char;
-}
+        <label for="shiftKey">Shift Key:</label>
+        <input type="number" id="shiftKey" value="3" />
 
-function encryptText() {
-  const inputText = document.getElementById('inputText').value;
-  const shiftKey = parseInt(document.getElementById('shiftKey').value);
-  let encryptedText = '';
+        <button onclick="encryptText()">Encrypt</button>
+        <button onclick="decipherText()">Decipher</button>
+        <button onclick="goBack()">Select Difficulty</button>
 
-  // Split input into words, handle spaces as dots
-  const words = inputText.split(' ');
+        <h2>Result</h2>
+        <textarea id="outputText" readonly></textarea>
+      `;
 
-  words.forEach(word => {
-    // Reverse the word (last-to-first encryption)
-    const reversedWord = word.split('').reverse().join('');
+      // Easy Encryption logic here
+      window.encryptText = function () {
+        const inputText = document.getElementById('inputText').value;
+        const shiftKey = parseInt(document.getElementById('shiftKey').value);
+        let encryptedText = '';
 
-    // Encrypt each character using Caesar shift
-    let encryptedWord = '';
-    for (let i = 0; i < reversedWord.length; i++) {
-      encryptedWord += caesarShiftChar(reversedWord[i], shiftKey);
+        const words = inputText.split(' ');
+        words.forEach(word => {
+          const reversedWord = word.split('').reverse().join('');
+          let encryptedWord = '';
+          for (let i = 0; i < reversedWord.length; i++) {
+            encryptedWord += caesarShiftChar(reversedWord[i], shiftKey);
+          }
+          encryptedWord += reversedWord.length;
+          encryptedText += encryptedWord + '.';
+        });
+
+        encryptedText = encryptedText.endsWith('.') ? encryptedText.slice(0, -1) : encryptedText;
+        document.getElementById('outputText').value = encryptedText;
+      };
+
+      window.decipherText = function () {
+        const encryptedText = document.getElementById('outputText').value;
+        const shiftKey = parseInt(document.getElementById('shiftKey').value);
+        let decipheredText = '';
+
+        const words = encryptedText.split('.');
+        words.forEach(encryptedWord => {
+          const wordWithoutLength = encryptedWord.slice(0, -parseInt(encryptedWord.match(/\d+$/)?.[0] || 0));
+          let decryptedWord = '';
+          for (let i = 0; i < wordWithoutLength.length; i++) {
+            decryptedWord += caesarShiftChar(wordWithoutLength[i], -shiftKey);
+          }
+          const originalWord = decryptedWord.split('').reverse().join('');
+          decipheredText += originalWord + ' ';
+        });
+
+        decipheredText = decipheredText.trim();
+        document.getElementById('outputText').value = decipheredText;
+      };
     }
 
-    // Append the word length
-    encryptedWord += reversedWord.length;
+    // Function to render Hard Encryption UI
+    function startHard() {
+      document.getElementById('mainContainer').innerHTML = `
+        <h1>Hard Encryption</h1>
+        <label for="inputText">Enter Text:</label>
+        <textarea id="inputText" placeholder="Enter your text here..."></textarea>
 
-    // Replace spaces with dots
-    encryptedText += encryptedWord + '.';
-  });
+        <label for="shiftKey">Shift Key:</label>
+        <input type="number" id="shiftKey" value="3" />
 
-  // Remove the last extra dot if it exists
-  encryptedText = encryptedText.endsWith('.') ? encryptedText.slice(0, -1) : encryptedText;
+        <label for="playfairKey">Playfair Key:</label>
+        <input type="text" id="playfairKey" placeholder="Enter Playfair Key" />
 
-  // Display the encrypted text
-  document.getElementById('outputText').value = encryptedText;
-}
+        <button onclick="encryptHard()">Encrypt</button>
+        <button onclick="decryptHard()">Decrypt</button>
+        <button onclick="goBack()">Select Difficulty</button>
+
+        <h2>Result</h2>
+        <textarea id="outputText" readonly></textarea>
+      `;
+
+      // Hard Encryption logic
+      window.encryptHard = function () {
+        const inputText = document.getElementById('inputText').value;
+        const shiftKey = parseInt(document.getElementById('shiftKey').value);
+        const playfairKey = document.getElementById('playfairKey').value;
+
+        // Step 1: Caesar Cipher
+        let caesarText = '';
+        for (let char of inputText) {
+          caesarText += caesarShiftChar(char, shiftKey);
+        }
+
+        // Step 2: Playfair Cipher (dummy implementation here for simplicity)
+        let playfairText = caesarText.split('').reverse().join(''); // Replace with real Playfair logic
+
+        // Step 3: Advanced encryption
+        let encryptedText = '';
+        const words = playfairText.split(' ');
+        words.forEach(word => {
+          const reversedWord = word.split('').reverse().join('');
+          let encryptedWord = '';
+          for (let i = 0; i < reversedWord.length; i++) {
+            encryptedWord += caesarShiftChar(reversedWord[i], shiftKey);
+          }
+          encryptedWord += reversedWord.length;
+          encryptedText += encryptedWord + '.';
+        });
+
+        encryptedText = encryptedText.endsWith('.') ? encryptedText.slice(0, -1) : encryptedText;
+        document.getElementById('outputText').value = encryptedText;
+      };
+
+      window.decryptHard = function () {
+        // Implement decryption reversing the steps of encryption
+        alert("Decryption logic for Hard Encryption here!");
+      };
+    }
+
+    // Caesar Shift Helper
+    function caesarShiftChar(char, shift) {
+      const charCode = char.charCodeAt(0);
+      if (char.toLowerCase() !== char.toUpperCase()) {
+        const base = char.toLowerCase() === char ? 97 : 65;
+        return String.fromCharCode(((charCode - base + shift) % 26 + 26) % 26 + base);
+      }
+      return char;
+    }
+
+    // Go back to the difficulty selection screen
+    function goBack() {
+      document.getElementById('mainContainer').innerHTML = `
+        <h1>Select Difficulty</h1>
+        <button onclick="startEasy()">Easy Encryption</button>
+        <button onclick="startHard()">Hard Encryption</button>
+      `;
+    }
   </script>
 </body>
 </html>
