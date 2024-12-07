@@ -226,7 +226,7 @@ function decryptHard() {
   });
 
   // Step 2: Playfair Cipher Decryption (Alphabetic only)
-  const alphabetOnly = sigbinDecrypted.replace(/[^a-zA-Z]/g, '');
+  const alphabetOnly = sigbinDecrypted.replace(/[^a-zA-Z]/g, ''); // Extract only alphabetic characters
   const playfairDecrypted = playfairDecrypt(alphabetOnly, playfairKey);
 
   // Step 3: Restore Original Case and Non-Alphabetic Characters
@@ -243,8 +243,9 @@ function decryptHard() {
     }
   }
 
-  document.getElementById('outputText').value = finalDecrypted.trim();
+  document.getElementById('outputText').value = finalDecrypted.trim(); // Final decrypted text
 }
+
 
 
     // Hard Level Initialization
