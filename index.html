@@ -108,7 +108,6 @@
     // Playfair Cipher encryption helper
     function playfairEncrypt(text, key) {
       // Simplified placeholder for Playfair Cipher logic
-      // Replace "J" with "I", and remove spaces
       text = text.toUpperCase().replace(/J/g, "I").replace(/\s+/g, "");
       key = key.toUpperCase().replace(/J/g, "I");
       return text.split('').reverse().join('') + '(PF)';
@@ -116,7 +115,6 @@
 
     // Playfair Cipher decryption helper
     function playfairDecrypt(text, key) {
-      // Simplified placeholder for Playfair Cipher logic
       return text.replace('(PF)', '').split('').reverse().join('');
     }
 
@@ -168,7 +166,8 @@
         for (let char of word) {
           decryptedWord += caesarShiftChar(char, -shiftKey);
         }
-        decryptedText += decryptedWord.split('').reverse().join('') + ' ';
+        const originalWord = decryptedWord.split('').reverse().join('');
+        decryptedText += originalWord + originalWord.length + ' ';
       });
 
       document.getElementById('outputText').value = decryptedText.trim();
@@ -210,7 +209,7 @@
       // Step 2: Playfair Cipher
       const playfairEncrypted = playfairEncrypt(caesarEncrypted, playfairKey);
 
-      // Step 3: Reversed Caesar Cipher logic (Easy level)
+      // Step 3: Apply Easy Level Logic
       let finalEncrypted = '';
       const words = playfairEncrypted.split(' ');
       words.forEach(word => {
@@ -230,7 +229,7 @@
       const shiftKey = parseInt(document.getElementById('shiftKey').value);
       const playfairKey = document.getElementById('playfairKey').value;
 
-      // Step 1: Reverse Caesar Cipher logic (Easy level)
+      // Step 1: Reverse Easy Level Logic
       let intermediateText = '';
       const words = encryptedText.split('.');
       words.forEach(word => {
