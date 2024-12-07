@@ -88,239 +88,176 @@
 <body>
   <div class="container" id="mainContainer">
     <h1>Welcome to the Encryption Tool</h1>
-    <p>Select your level of difficulty:</p>
-    <button class="btn" onclick="startEasy()">Easy Encryption</button>
-    <button class="btn" onclick="startHard()">Hard Encryption</button>
+    <p>Select a cipher:</p>
+    <button class="btn" onclick="startCaesar()">Caesar Cipher</button>
+    <button class="btn" onclick="startSigbin()">Sigbin Cipher</button>
+    <button class="btn" onclick="startPlayfair()">Playfair Cipher</button>
   </div>
 
   <script>
+    // Caesar Cipher Function
     function caesarShiftChar(char, shift) {
-  const charCode = char.charCodeAt(0);
-  if (char.toLowerCase() !== char.toUpperCase()) {
-    const base = char.toLowerCase() === char ? 97 : 65;
-    return String.fromCharCode(((charCode - base + shift) % 26 + 26) % 26 + base);
-  }
-  return char; // Non-alphabet characters remain unchanged
-}
-
-// Sigbin Cipher (Easy Level)
-function encryptEasy() {
-  const inputText = document.getElementById('inputText').value;
-  const shiftKey = parseInt(document.getElementById('shiftKey').value);
-  let encryptedText = '';
-
-  const words = inputText.split(' ');
-  words.forEach(word => {
-    const reversedWord = word.split('').reverse().join('');
-    let encryptedWord = '';
-    for (let char of reversedWord) {
-      encryptedWord += caesarShiftChar(char, shiftKey);
-    }
-    encryptedWord += reversedWord.length;
-    encryptedText += encryptedWord + '.';
-  });
-
-  document.getElementById('outputText').value = encryptedText.slice(0, -1);
-}
-
-function decryptEasy() {
-  const encryptedText = document.getElementById('outputText').value;
-  const shiftKey = parseInt(document.getElementById('shiftKey').value);
-  let decryptedText = '';
-
-  const words = encryptedText.split('.');
-  words.forEach(word => {
-    const length = parseInt(word.slice(-1));
-    let decryptedWord = '';
-    for (let char of word.slice(0, -1)) {
-      decryptedWord += caesarShiftChar(char, -shiftKey);
-    }
-    decryptedText += decryptedWord.slice(-length).split('').reverse().join('') + ' ';
-  });
-
-  document.getElementById('outputText').value = decryptedText.trim();
-}
-
-// Playfair Cipher (for Hard Level)
-function playfairEncrypt(text, key) {
-  text = text.toUpperCase().replace(/J/g, "I").replace(/\s+/g, "");
-  key = key.toUpperCase().replace(/J/g, "I");
-  return text.split('').reverse().join('') + '(PF)';
-}
-
-function playfairDecrypt(text, key) {
-  const matrix = createPlayfairMatrix(key);
-  let decryptedText = '';
-
-  for (let i = 0; i < text.length; i += 2) {
-    const digraph = text.substring(i, i + 2);
-    decryptedText += decryptDigraph(digraph, matrix);
-  }
-
-  return decryptedText;
-}
-
-function createPlayfairMatrix(key) {
-  // Create Playfair matrix based on the key
-  const matrix = [];
-  let alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ".split('');
-  let keyChars = key.split('');
-  let used = new Set();
-
-  for (let char of keyChars) {
-    if (!used.has(char)) {
-      matrix.push(char);
-      used.add(char);
-    }
-  }
-  
-  for (let char of alphabet) {
-    if (!used.has(char)) {
-      matrix.push(char);
-      used.add(char);
-    }
-  }
-
-  return matrix;
-}
-
-function decryptDigraph(digraph, matrix) {
-  // Implement the decryption logic for Playfair
-  const [char1, char2] = digraph;
-  let decryptedChars = [char1, char2];
-  
-  // Use Playfair decryption rules (This needs to be completed based on Playfair cipher rules)
-  // For now, returning the same letters as a placeholder
-  return decryptedChars.join('');
-}
-
-// Hard Level Encryption and Decryption
-function encryptHard() {
-  const inputText = document.getElementById('inputText').value;
-  const shiftKey = parseInt(document.getElementById('shiftKey').value);
-  const playfairKey = document.getElementById('playfairKey').value;
-
-  // Step 1: Caesar Cipher Encryption
-  let caesarEncrypted = '';
-  for (let char of inputText) {
-    caesarEncrypted += caesarShiftChar(char, shiftKey);
-  }
-
-  // Step 2: Playfair Cipher Encryption (Alphabetic only)
-  const alphabetOnly = caesarEncrypted.replace(/[^a-zA-Z]/g, '');
-  const playfairEncrypted = playfairEncrypt(alphabetOnly, playfairKey);
-
-  // Step 3: Sigbin Cipher Encryption
-  let sigbinEncrypted = '';
-  let alphaIndex = 0;
-  const words = caesarEncrypted.split(' '); // Split by spaces to handle word structure
-  words.forEach(word => {
-    const reversedWord = word.split('').reverse().join('');
-    let encryptedWord = '';
-    for (let char of reversedWord) {
-      if (/[a-zA-Z]/.test(char)) {
-        encryptedWord += playfairEncrypted[alphaIndex++]; // Apply Playfair result for letters
-      } else {
-        encryptedWord += char; // Keep non-alphabetic characters as-is
+      const charCode = char.charCodeAt(0);
+      if (char.toLowerCase() !== char.toUpperCase()) {
+        const base = char.toLowerCase() === char ? 97 : 65;
+        return String.fromCharCode(((charCode - base + shift) % 26 + 26) % 26 + base);
       }
-    }
-    encryptedWord += reversedWord.length; // Append the word length
-    sigbinEncrypted += encryptedWord + '.';
-  });
-
-  document.getElementById('outputText').value = sigbinEncrypted.slice(0, -1); // Remove trailing dot
-}
-
-function decryptHard() {
-  const encryptedText = document.getElementById('outputText').value;
-  const shiftKey = parseInt(document.getElementById('shiftKey').value);
-  const playfairKey = document.getElementById('playfairKey').value;
-
-  // Step 1: Sigbin Cipher Decryption
-  let sigbinDecrypted = '';
-  const words = encryptedText.split('.');
-  words.forEach(word => {
-    const length = parseInt(word.slice(-1)); // Extract word length
-    let decryptedWord = '';
-    
-    // Apply Caesar decryption to all characters
-    for (let char of word.slice(0, -1)) {
-      decryptedWord += caesarShiftChar(char, -shiftKey);
+      return char; // Non-alphabet characters remain unchanged
     }
 
-    // Ensure correct word structure and reverse the characters as per the Sigbin cipher
-    const reversedWord = decryptedWord.slice(-length).split('').reverse().join('');
-    sigbinDecrypted += reversedWord + ' '; // Add space after each word
-  });
-
-  // Step 2: Playfair Cipher Decryption (Alphabetic only)
-  const alphabetOnly = sigbinDecrypted.replace(/[^a-zA-Z]/g, ''); // Extract only alphabetic characters
-  const playfairDecrypted = playfairDecrypt(alphabetOnly, playfairKey);
-
-  // Step 3: Restoring Original Case and Non-Alphabetic Characters
-  let finalDecrypted = '';
-  let alphaIndex = 0;
-  for (let i = 0; i < sigbinDecrypted.length; i++) {
-    const char = sigbinDecrypted[i];
-    if (/[a-zA-Z]/.test(char)) {
-      let decryptedChar = playfairDecrypted[alphaIndex++];
-      decryptedChar = char === char.toLowerCase() ? decryptedChar.toLowerCase() : decryptedChar.toUpperCase(); // Match case
-      finalDecrypted += decryptedChar;
-    } else {
-      finalDecrypted += char; // Keep non-alphabetic characters
+    function encryptCaesar() {
+      const inputText = document.getElementById('inputText').value;
+      const shiftKey = parseInt(document.getElementById('shiftKey').value);
+      let encryptedText = '';
+      for (let char of inputText) {
+        encryptedText += caesarShiftChar(char, shiftKey);
+      }
+      document.getElementById('outputText').value = encryptedText;
     }
-  }
 
-  document.getElementById('outputText').value = finalDecrypted.trim(); // Final decrypted text
-}
+    function decryptCaesar() {
+      const encryptedText = document.getElementById('outputText').value;
+      const shiftKey = parseInt(document.getElementById('shiftKey').value);
+      let decryptedText = '';
+      for (let char of encryptedText) {
+        decryptedText += caesarShiftChar(char, -shiftKey);
+      }
+      document.getElementById('outputText').value = decryptedText;
+    }
 
-function goBack() {
-  document.getElementById('mainContainer').innerHTML = `
-    <h1>Welcome to the Encryption Tool</h1>
-    <p>Select your level of difficulty:</p>
-    <button class="btn" onclick="startEasy()">Easy Encryption</button>
-    <button class="btn" onclick="startHard()">Hard Encryption</button>
-  `;
-}
+    // Sigbin Cipher Functions
+    function encryptSigbin() {
+      const inputText = document.getElementById('inputText').value;
+      const shiftKey = parseInt(document.getElementById('shiftKey').value);
+      let encryptedText = '';
 
-function startEasy() {
-  document.getElementById('mainContainer').innerHTML = `
-    <h1>Easy Encryption</h1>
-    <label for="inputText">Enter Text:</label>
-    <textarea id="inputText" placeholder="Enter your text here..."></textarea>
+      const words = inputText.split(' ');
+      words.forEach(word => {
+        const reversedWord = word.split('').reverse().join('');
+        let encryptedWord = '';
+        for (let char of reversedWord) {
+          encryptedWord += caesarShiftChar(char, shiftKey);
+        }
+        encryptedWord += reversedWord.length;
+        encryptedText += encryptedWord + '.';
+      });
 
-    <label for="shiftKey">Shift Key:</label>
-    <input type="number" id="shiftKey" value="3" />
+      document.getElementById('outputText').value = encryptedText.slice(0, -1);
+    }
 
-    <button class="btn" onclick="encryptEasy()">Encrypt</button>
-    <button class="btn" onclick="decryptEasy()">Decrypt</button>
-    <button class="btn back" onclick="goBack()">Back to Selection</button>
+    function decryptSigbin() {
+      const encryptedText = document.getElementById('outputText').value;
+      const shiftKey = parseInt(document.getElementById('shiftKey').value);
+      let decryptedText = '';
 
-    <h2>Result</h2>
-    <textarea id="outputText" readonly></textarea>
-  `;
-}
+      const words = encryptedText.split('.');
+      words.forEach(word => {
+        const length = parseInt(word.slice(-1));
+        let decryptedWord = '';
+        for (let char of word.slice(0, -1)) {
+          decryptedWord += caesarShiftChar(char, -shiftKey);
+        }
+        decryptedText += decryptedWord.slice(-length).split('').reverse().join('') + ' ';
+      });
 
-function startHard() {
-  document.getElementById('mainContainer').innerHTML = `
-    <h1>Hard Encryption</h1>
-    <label for="inputText">Enter Text:</label>
-    <textarea id="inputText" placeholder="Enter your text here..."></textarea>
+      document.getElementById('outputText').value = decryptedText.trim();
+    }
 
-    <label for="shiftKey">Caesar Cipher Shift Key:</label>
-    <input type="number" id="shiftKey" value="3" />
+    // Playfair Cipher Functions
+    function playfairEncrypt(text, key) {
+      // Replace J with I and clean text
+      text = text.toUpperCase().replace(/J/g, "I").replace(/\s+/g, "");
+      key = key.toUpperCase().replace(/J/g, "I");
+      return text.split('').reverse().join('') + '(PF)';
+    }
 
-    <label for="playfairKey">Playfair Cipher Key:</label>
-    <input type="text" id="playfairKey" placeholder="Enter Playfair Key" />
+    function playfairDecrypt(text, key) {
+      return text.replace('(PF)', '').split('').reverse().join('');
+    }
 
-    <button class="btn" onclick="encryptHard()">Encrypt</button>
-    <button class="btn" onclick="decryptHard()">Decrypt</button>
-    <button class="btn back" onclick="goBack()">Back to Selection</button>
+    function encryptPlayfair() {
+      const inputText = document.getElementById('inputText').value;
+      const playfairKey = document.getElementById('playfairKey').value;
 
-    <h2>Result</h2>
-    <textarea id="outputText" readonly></textarea>
-  `;
-}
+      // Step 1: Apply Playfair Cipher (Alphabetic characters only)
+      const playfairEncrypted = playfairEncrypt(inputText, playfairKey);
+
+      document.getElementById('outputText').value = playfairEncrypted;
+    }
+
+    function decryptPlayfair() {
+      const encryptedText = document.getElementById('outputText').value;
+      const playfairKey = document.getElementById('playfairKey').value;
+
+      const playfairDecrypted = playfairDecrypt(encryptedText, playfairKey);
+
+      document.getElementById('outputText').value = playfairDecrypted;
+    }
+
+    // Initialization for each cipher
+    function startCaesar() {
+      document.getElementById('mainContainer').innerHTML = `
+        <h1>Caesar Cipher</h1>
+        <label for="inputText">Enter Text:</label>
+        <textarea id="inputText" placeholder="Enter your text here..."></textarea>
+
+        <label for="shiftKey">Shift Key:</label>
+        <input type="number" id="shiftKey" value="3" />
+
+        <button class="btn" onclick="encryptCaesar()">Encrypt</button>
+        <button class="btn" onclick="decryptCaesar()">Decrypt</button>
+        <button class="btn back" onclick="goBack()">Back to Selection</button>
+
+        <h2>Result</h2>
+        <textarea id="outputText" readonly></textarea>
+      `;
+    }
+
+    function startSigbin() {
+      document.getElementById('mainContainer').innerHTML = `
+        <h1>Sigbin Cipher</h1>
+        <label for="inputText">Enter Text:</label>
+        <textarea id="inputText" placeholder="Enter your text here..."></textarea>
+
+        <label for="shiftKey">Shift Key:</label>
+        <input type="number" id="shiftKey" value="3" />
+
+        <button class="btn" onclick="encryptSigbin()">Encrypt</button>
+        <button class="btn" onclick="decryptSigbin()">Decrypt</button>
+        <button class="btn back" onclick="goBack()">Back to Selection</button>
+
+        <h2>Result</h2>
+        <textarea id="outputText" readonly></textarea>
+      `;
+    }
+
+    function startPlayfair() {
+      document.getElementById('mainContainer').innerHTML = `
+        <h1>Playfair Cipher</h1>
+        <label for="inputText">Enter Text:</label>
+        <textarea id="inputText" placeholder="Enter your text here..."></textarea>
+
+        <label for="playfairKey">Playfair Cipher Key:</label>
+        <input type="text" id="playfairKey" placeholder="Enter Playfair Key" />
+
+        <button class="btn" onclick="encryptPlayfair()">Encrypt</button>
+        <button class="btn" onclick="decryptPlayfair()">Decrypt</button>
+        <button class="btn back" onclick="goBack()">Back to Selection</button>
+
+        <h2>Result</h2>
+        <textarea id="outputText" readonly></textarea>
+      `;
+    }
+
+    function goBack() {
+      document.getElementById('mainContainer').innerHTML = `
+        <h1>Welcome to the Encryption Tool</h1>
+        <p>Select a cipher:</p>
+        <button class="btn" onclick="startCaesar()">Caesar Cipher</button>
+        <button class="btn" onclick="startSigbin()">Sigbin Cipher</button>
+        <button class="btn" onclick="startPlayfair()">Playfair Cipher</button>
+      `;
+    }
   </script>
 </body>
 </html>
