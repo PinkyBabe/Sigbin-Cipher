@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Encryption Tool</title>
+  <title>Sigbin Cypher</title>
   <style>
     /* General Reset */
     * {
@@ -89,8 +89,8 @@
   <div class="container" id="mainContainer">
     <h1>Welcome to the Encryption Tool</h1>
     <p>Select your level of difficulty:</p>
-    <button class="btn" onclick="startEasy()">Easy Encryption</button>
-    <button class="btn" onclick="startHard()">Hard Encryption</button>
+    <button class="btn" onclick="startEasy()">Sigbin Cipher</button>
+    <button class="btn" onclick="startHard()">Advance Sigbin Cipher</button>
   </div>
 
   <script>
@@ -181,154 +181,45 @@
       `;
     }
 
-    // Playfair Cipher Utilities
-    function generatePlayfairMatrix(key) {
-      const matrix = [];
-      const alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ"; // Exclude 'J'
-      const used = new Set();
-
-      key = key.toUpperCase().replace(/J/g, "I"); // Replace J with I
-      for (const char of key + alphabet) {
-        if (!used.has(char) && alphabet.includes(char)) {
-          matrix.push(char);
-          used.add(char);
-        }
-      }
-
-      return Array.from({ length: 5 }, (_, i) => matrix.slice(i * 5, i * 5 + 5));
-    }
-
-    function playfairEncrypt(text, keyMatrix) {
-      const pairs = preparePlayfairText(text);
-      return pairs
-        .map(([a, b]) => encryptPlayfairPair(a, b, keyMatrix))
-        .join("");
-    }
-
-    function playfairDecrypt(text, keyMatrix) {
-      const pairs = preparePlayfairText(text, false);
-      return pairs
-        .map(([a, b]) => decryptPlayfairPair(a, b, keyMatrix))
-        .join("");
-    }
-
-    function preparePlayfairText(text, encrypt = true) {
-      text = text
-        .toUpperCase()
-        .replace(/J/g, "I")
-        .replace(/[^A-Z]/g, "");
-      const pairs = [];
-      for (let i = 0; i < text.length; i += 2) {
-        const a = text[i];
-        const b = text[i + 1] || (encrypt ? "X" : ""); // Use 'X' for padding
-        pairs.push(a === b ? [a, "X"] : [a, b]);
-      }
-      return pairs;
-    }
-
-    function encryptPlayfairPair(a, b, matrix) {
-      const [rowA, colA] = findPositionInMatrix(a, matrix);
-      const [rowB, colB] = findPositionInMatrix(b, matrix);
-
-      if (rowA === rowB) {
-        return (
-          matrix[rowA][(colA + 1) % 5] + matrix[rowB][(colB + 1) % 5]
-        );
-      } else if (colA === colB) {
-        return (
-          matrix[(rowA + 1) % 5][colA] + matrix[(rowB + 1) % 5][colB]
-        );
-      } else {
-        return matrix[rowA][colB] + matrix[rowB][colA];
-      }
-    }
-
-    function decryptPlayfairPair(a, b, matrix) {
-      const [rowA, colA] = findPositionInMatrix(a, matrix);
-      const [rowB, colB] = findPositionInMatrix(b, matrix);
-
-      if (rowA === rowB) {
-        return (
-          matrix[rowA][(colA + 4) % 5] + matrix[rowB][(colB + 4) % 5]
-        );
-      } else if (colA === colB) {
-        return (
-          matrix[(rowA + 4) % 5][colA] + matrix[(rowB + 4) % 5][colB]
-        );
-      } else {
-        return matrix[rowA][colB] + matrix[rowB][colA];
-      }
-    }
-
-    function findPositionInMatrix(char, matrix) {
-      for (let row = 0; row < 5; row++) {
-        const col = matrix[row].indexOf(char);
-        if (col !== -1) return [row, col];
-      }
-      return [-1, -1];
-    }
-
     function encryptHard() {
-      const inputText = document.getElementById("inputText").value;
-      const shiftKey = parseInt(document.getElementById("shiftKey").value);
-      const playfairKey = document.getElementById("playfairKey").value;
+      const inputText = document.getElementById('inputText').value;
+      const shiftKey = parseInt(document.getElementById('shiftKey').value);
 
       // Step 1: Caesar Cipher
-      let caesarEncrypted = "";
+      let caesarEncrypted = '';
       for (let char of inputText) {
         caesarEncrypted += caesarShiftChar(char, shiftKey);
       }
 
-      // Step 2: Playfair Cipher
-      const playfairMatrix = generatePlayfairMatrix(playfairKey);
-      const playfairEncrypted = playfairEncrypt(caesarEncrypted, playfairMatrix);
+      // Step 2: Reverse String
+      const reversed = caesarEncrypted.split('').reverse().join('');
 
-      // Step 3: Easy Encryption
-      const words = playfairEncrypted.split(" ");
-      let finalEncryptedText = "";
+      // Step 3: Add Playfair Cipher Placeholder
+      const finalEncrypted = reversed + '|(Playfair Placeholder)';
 
-      words.forEach((word) => {
-        const reversedWord = word.split("").reverse().join("");
-        let encryptedWord = "";
-        for (let char of reversedWord) {
-          encryptedWord += caesarShiftChar(char, shiftKey);
-        }
-        finalEncryptedText += encryptedWord + ".";
-      });
-
-      document.getElementById("outputText").value = finalEncryptedText.slice(0, -1);
+      document.getElementById('outputText').value = finalEncrypted;
     }
 
     function decryptHard() {
-      const encryptedText = document.getElementById("outputText").value;
-      const shiftKey = parseInt(document.getElementById("shiftKey").value);
-      const playfairKey = document.getElementById("playfairKey").value;
+      const encryptedText = document.getElementById('outputText').value;
+      const shiftKey = parseInt(document.getElementById('shiftKey').value);
 
-      // Step 1: Easy Decryption
-      const words = encryptedText.split(".");
-      let easyDecrypted = "";
+      // Step 1: Remove Playfair Cipher Placeholder
+      const withoutPlayfair = encryptedText.split('|')[0];
 
-      words.forEach((word) => {
-        let decryptedWord = "";
-        for (let char of word) {
-          decryptedWord += caesarShiftChar(char, -shiftKey);
-        }
-        easyDecrypted += decryptedWord.split("").reverse().join("") + " ";
-      });
+      // Step 2: Reverse String
+      const reversed = withoutPlayfair.split('').reverse().join('');
 
-      // Step 2: Playfair Decryption
-      const playfairMatrix = generatePlayfairMatrix(playfairKey);
-      const playfairDecrypted = playfairDecrypt(easyDecrypted.trim(), playfairMatrix);
-
-      // Step 3: Caesar Decryption
-      let finalDecryptedText = "";
-      for (let char of playfairDecrypted) {
-        finalDecryptedText += caesarShiftChar(char, -shiftKey);
+      // Step 3: Caesar Cipher Decryption
+      let caesarDecrypted = '';
+      for (let char of reversed) {
+        caesarDecrypted += caesarShiftChar(char, -shiftKey);
       }
 
-      document.getElementById("outputText").value = finalDecryptedText;
+      document.getElementById('outputText').value = caesarDecrypted;
     }
 
+    // Back to selection
     function goBack() {
       document.getElementById('mainContainer').innerHTML = `
         <h1>Welcome to the Encryption Tool</h1>
