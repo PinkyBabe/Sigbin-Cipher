@@ -3,81 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Encryption Tool</title>
+  <title>Encryption Levels</title>
   <style>
-    /* General Reset */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: 'Arial', sans-serif;
-      background: linear-gradient(to bottom right, #1e1e2f, #27293d);
-      color: #ffffff;
-      height: 100vh;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
+      height: 100vh;
+      margin: 0;
     }
 
     .container {
-      background: #343547;
-      border-radius: 12px;
-      padding: 30px;
-      box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.5);
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       max-width: 600px;
-      width: 90%;
+      width: 100%;
+    }
+
+    h1, h2 {
       text-align: center;
     }
 
-    h1 {
-      color: #61dafb;
+    .button-group {
+      display: flex;
+      justify-content: space-between;
       margin-bottom: 20px;
     }
 
-    .btn {
-      margin: 15px 5px;
-      padding: 12px 25px;
+    textarea, input, button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
       font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      background: #007bff;
+    }
+
+    button {
+      background-color: #007bff;
       color: white;
       cursor: pointer;
-      transition: all 0.3s ease;
     }
 
-    .btn:hover {
-      background: #0056b3;
-    }
-
-    .btn.back {
-      background: #dc3545;
-    }
-
-    .btn.back:hover {
-      background: #c82333;
-    }
-
-    textarea, input {
-      width: 90%;
-      margin: 10px 0;
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      outline: none;
-      background: #444;
-      color: white;
-      font-size: 14px;
+    button:hover {
+      background-color: #0056b3;
     }
 
     label {
-      font-size: 16px;
-      margin-bottom: 5px;
-      display: block;
+      font-weight: bold;
     }
 
     .hidden {
@@ -86,50 +64,82 @@
   </style>
 </head>
 <body>
-  <div class="container" id="mainContainer">
-    <h1>Welcome to the Encryption Tool</h1>
-    <p>Select your level of difficulty:</p>
-    <button class="btn" onclick="startEasy()">Easy Encryption</button>
-    <button class="btn" onclick="startHard()">Hard Encryption</button>
+  <div class="container">
+    <h1>Select Encryption Level</h1>
+    <div id="selection">
+      <button onclick="selectLevel('easy')">Easy Encryption</button>
+      <button onclick="selectLevel('hard')">Hard Encryption</button>
+    </div>
+
+    <div id="easy" class="hidden">
+      <h2>Easy Encryption</h2>
+      <label for="inputText">Enter Text:</label>
+      <textarea id="inputText" placeholder="Enter your text here..."></textarea>
+
+      <label for="shiftKey">Shift Key:</label>
+      <input type="number" id="shiftKey" value="3" />
+
+      <button onclick="encryptEasy()">Encrypt</button>
+      <button onclick="decryptEasy()">Decrypt</button>
+
+      <h2>Output</h2>
+      <textarea id="outputText" readonly></textarea>
+      <button onclick="reset()">Back to Selection</button>
+    </div>
+
+    <div id="hard" class="hidden">
+      <h2>Hard Encryption</h2>
+      <label for="inputText">Enter Text:</label>
+      <textarea id="inputText" placeholder="Enter your text here..."></textarea>
+
+      <label for="shiftKey">Shift Key:</label>
+      <input type="number" id="shiftKey" value="3" />
+
+      <label for="playfairKey">Playfair Key:</label>
+      <input type="text" id="playfairKey" placeholder="Enter Playfair key..." />
+
+      <button onclick="encryptHard()">Encrypt</button>
+      <button onclick="decryptHard()">Decrypt</button>
+
+      <h2>Output</h2>
+      <textarea id="outputText" readonly></textarea>
+      <button onclick="reset()">Back to Selection</button>
+    </div>
   </div>
 
   <script>
-    // Utility function to shift characters for Caesar Cipher
+    // Show the appropriate level interface
+    function selectLevel(level) {
+      document.getElementById('selection').classList.add('hidden');
+      document.getElementById(level).classList.remove('hidden');
+    }
+
+    // Reset to level selection
+    function reset() {
+      document.getElementById('easy').classList.add('hidden');
+      document.getElementById('hard').classList.add('hidden');
+      document.getElementById('selection').classList.remove('hidden');
+      document.getElementById('inputText').value = '';
+      document.getElementById('outputText').value = '';
+    }
+
+    // Caesar Cipher function
     function caesarShiftChar(char, shift) {
       const charCode = char.charCodeAt(0);
-
       if (char.toLowerCase() !== char.toUpperCase()) {
         const base = char.toLowerCase() === char ? 97 : 65;
         return String.fromCharCode(((charCode - base + shift) % 26 + 26) % 26 + base);
       }
-      return char; // Return unchanged for non-alphabetic characters
+      return char;
     }
 
-    // EASY ENCRYPTION LOGIC
-    function startEasy() {
-      document.getElementById('mainContainer').innerHTML = `
-        <h1>Easy Encryption</h1>
-        <label for="inputText">Enter Text:</label>
-        <textarea id="inputText" placeholder="Enter your text here..."></textarea>
-
-        <label for="shiftKey">Shift Key:</label>
-        <input type="number" id="shiftKey" value="3" />
-
-        <button class="btn" onclick="encryptEasy()">Encrypt</button>
-        <button class="btn" onclick="decryptEasy()">Decrypt</button>
-        <button class="btn back" onclick="goBack()">Back to Selection</button>
-
-        <h2>Result</h2>
-        <textarea id="outputText" readonly></textarea>
-      `;
-    }
-
+    // Easy Encryption and Decryption
     function encryptEasy() {
       const inputText = document.getElementById('inputText').value;
       const shiftKey = parseInt(document.getElementById('shiftKey').value);
-      let encryptedText = '';
-
       const words = inputText.split(' ');
+
+      let encryptedText = '';
       words.forEach(word => {
         const reversedWord = word.split('').reverse().join('');
         let encryptedWord = '';
@@ -145,9 +155,9 @@
     function decryptEasy() {
       const encryptedText = document.getElementById('outputText').value;
       const shiftKey = parseInt(document.getElementById('shiftKey').value);
-      let decryptedText = '';
-
       const words = encryptedText.split('.');
+
+      let decryptedText = '';
       words.forEach(word => {
         let decryptedWord = '';
         for (let char of word) {
@@ -159,74 +169,38 @@
       document.getElementById('outputText').value = decryptedText.trim();
     }
 
-    // HARD ENCRYPTION LOGIC (CHAINING MULTIPLE CIPHERS)
-    function startHard() {
-      document.getElementById('mainContainer').innerHTML = `
-        <h1>Hard Encryption</h1>
-        <label for="inputText">Enter Text:</label>
-        <textarea id="inputText" placeholder="Enter your text here..."></textarea>
+    // Playfair Cipher Utilities
+    function generatePlayfairMatrix(key) {
+      const matrix = [];
+      const alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ"; // Exclude 'J'
+      const used = new Set();
 
-        <label for="shiftKey">Caesar Cipher Shift Key:</label>
-        <input type="number" id="shiftKey" value="3" />
-
-        <label for="playfairKey">Playfair Cipher Key:</label>
-        <input type="text" id="playfairKey" placeholder="Enter Playfair Key" />
-
-        <button class="btn" onclick="encryptHard()">Encrypt</button>
-        <button class="btn" onclick="decryptHard()">Decrypt</button>
-        <button class="btn back" onclick="goBack()">Back to Selection</button>
-
-        <h2>Result</h2>
-        <textarea id="outputText" readonly></textarea>
-      `;
-    }
-
-    function encryptHard() {
-      const inputText = document.getElementById('inputText').value;
-      const shiftKey = parseInt(document.getElementById('shiftKey').value);
-
-      // Step 1: Caesar Cipher
-      let caesarEncrypted = '';
-      for (let char of inputText) {
-        caesarEncrypted += caesarShiftChar(char, shiftKey);
+      key = key.toUpperCase().replace(/J/g, "I");
+      for (const char of key + alphabet) {
+        if (!used.has(char) && alphabet.includes(char)) {
+          matrix.push(char);
+          used.add(char);
+        }
       }
 
-      // Step 2: Reverse String
-      const reversed = caesarEncrypted.split('').reverse().join('');
+      return Array.from({ length: 5 }, (_, i) => matrix.slice(i * 5, i * 5 + 5));
+    }
 
-      // Step 3: Add Playfair Cipher Placeholder
-      const finalEncrypted = reversed + '|(Playfair Placeholder)';
+    function playfairEncrypt(text, keyMatrix) {
+      // Playfair encryption logic here
+    }
 
-      document.getElementById('outputText').value = finalEncrypted;
+    function playfairDecrypt(text, keyMatrix) {
+      // Playfair decryption logic here
+    }
+
+    // HARD ENCRYPTION FUNCTION
+    function encryptHard() {
+      // Hard encryption logic here
     }
 
     function decryptHard() {
-      const encryptedText = document.getElementById('outputText').value;
-      const shiftKey = parseInt(document.getElementById('shiftKey').value);
-
-      // Step 1: Remove Playfair Cipher Placeholder
-      const withoutPlayfair = encryptedText.split('|')[0];
-
-      // Step 2: Reverse String
-      const reversed = withoutPlayfair.split('').reverse().join('');
-
-      // Step 3: Caesar Cipher Decryption
-      let caesarDecrypted = '';
-      for (let char of reversed) {
-        caesarDecrypted += caesarShiftChar(char, -shiftKey);
-      }
-
-      document.getElementById('outputText').value = caesarDecrypted;
-    }
-
-    // Back to selection
-    function goBack() {
-      document.getElementById('mainContainer').innerHTML = `
-        <h1>Welcome to the Encryption Tool</h1>
-        <p>Select your level of difficulty:</p>
-        <button class="btn" onclick="startEasy()">Easy Encryption</button>
-        <button class="btn" onclick="startHard()">Hard Encryption</button>
-      `;
+      // Hard decryption logic here
     }
   </script>
 </body>
