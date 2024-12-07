@@ -112,61 +112,83 @@
       return text.split('').map(char => caesarShiftChar(char, -shift)).join('');
     }
 
-    // Sigbin Cipher functions (Reverse → Caesar → Word Length)
+    // Sigbin Cipher (Reverse → Caesar → Word Length)
     function sigbinEncrypt(text, shift) {
       const words = text.split(' ');
-      return words.map(word => {
-        // Step 1: Reverse the word
+      let encryptedText = '';
+      
+      words.forEach(word => {
+        // Reverse the word
         const reversedWord = word.split('').reverse().join('');
 
-        // Step 2: Apply Caesar cipher to the reversed word
-        const caesarEncrypted = caesarEncrypt(reversedWord, shift);
+        // Apply Caesar cipher to the reversed word
+        let encryptedWord = '';
+        for (let i = 0; i < reversedWord.length; i++) {
+          encryptedWord += caesarShiftChar(reversedWord[i], shift);
+        }
 
-        // Step 3: Add word length directly after the word
-        return caesarEncrypted + caesarEncrypted.length;
-      }).join(' ').replace(/\s/g, ''); // No dots in between words
+        // Add the word length at the end of the encrypted word
+        encryptedWord += reversedWord.length;
+
+        // Replace spaces with dots
+        encryptedText += encryptedWord + '.';
+      });
+
+      // Remove the last extra dot
+      encryptedText = encryptedText.endsWith('.') ? encryptedText.slice(0, -1) : encryptedText;
+
+      return encryptedText;
     }
 
     function sigbinDecrypt(text, shift) {
-      const words = text.split(' ').map(word => {
-        // Extract word and word length
-        const wordLength = parseInt(word.slice(-1));
-        const encryptedWord = word.slice(0, -1);
+      const words = text.split('.'); // Split by dots instead of spaces
+      let decryptedText = '';
+      
+      words.forEach(word => {
+        // Extract the word length (last character)
+        const wordLength = parseInt(word.charAt(word.length - 1));
+        const encryptedWord = word.slice(0, word.length - 1); // Remove word length
 
-        // Step 1: Apply Caesar decryption
-        const caesarDecrypted = caesarDecrypt(encryptedWord, shift);
+        // Decrypt using Caesar cipher
+        let caesarDecrypted = '';
+        for (let i = 0; i < encryptedWord.length; i++) {
+          caesarDecrypted += caesarShiftChar(encryptedWord[i], -shift);
+        }
 
-        // Step 2: Reverse the decrypted word
-        return caesarDecrypted.split('').reverse().join('');
-      }).join(' ');
+        // Reverse the decrypted word to get the original
+        decryptedText += caesarDecrypted.split('').reverse().join('') + ' ';
+      });
 
-      return words;
+      // Remove the last space
+      decryptedText = decryptedText.trim();
+
+      return decryptedText;
     }
 
-    // Sigbin Caesar Cipher functions (Caesar → Sigbin → Caesar)
+    // Sigbin Caesar Cipher (Caesar → Sigbin → Caesar)
     function sigbinCaesarEncrypt(text, shift) {
-      // Step 1: Caesar encryption
+      // Step 1: Apply Caesar cipher
       const caesarEncrypted = caesarEncrypt(text, shift);
 
-      // Step 2: Sigbin encryption (reverse words + word length)
+      // Step 2: Apply Sigbin cipher to the Caesar-encrypted text
       const sigbinEncrypted = sigbinEncrypt(caesarEncrypted, shift);
 
-      // Step 3: Caesar encryption again
+      // Step 3: Apply Caesar cipher again
       return caesarEncrypt(sigbinEncrypted, shift);
     }
 
     function sigbinCaesarDecrypt(text, shift) {
-      // Step 1: Reverse Caesar decryption
+      // Step 1: Apply Caesar decryption
       const caesarDecrypted = caesarDecrypt(text, shift);
 
-      // Step 2: Sigbin decryption (reverse words + word length)
+      // Step 2: Apply Sigbin decryption to the Caesar-decrypted text
       const sigbinDecrypted = sigbinDecrypt(caesarDecrypted, shift);
 
-      // Step 3: Reverse Caesar decryption again
+      // Step 3: Apply Caesar decryption again
       return caesarDecrypt(sigbinDecrypted, shift);
     }
 
-    // Function to handle the show options and encrypt/decrypt flow
+    // Functions to handle the show options and encrypt/decrypt flow
     function showCaesarOptions() {
       document.getElementById('mainContainer').innerHTML = `
         <h1>Caesar Cipher</h1>
