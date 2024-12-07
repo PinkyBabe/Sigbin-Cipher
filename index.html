@@ -123,7 +123,7 @@
       document.getElementById('outputText').value = decryptedText;
     }
 
-    // Sigbin Cipher Functions (Reverse and Caesar)
+    // Sigbin Cipher Functions (Reverse and Caesar with Word Length)
     function encryptSigbin() {
       const inputText = document.getElementById('inputText').value;
       const shiftKey = parseInt(document.getElementById('shiftKey').value);
@@ -136,6 +136,7 @@
         for (let char of reversedWord) {
           encryptedWord += caesarShiftChar(char, shiftKey);
         }
+        encryptedWord += reversedWord.length; // Append word length
         encryptedText += encryptedWord + ' '; // Ensure word boundaries
       });
 
@@ -149,11 +150,12 @@
 
       const words = encryptedText.split(' ');
       words.forEach(word => {
+        const length = parseInt(word.slice(-1)); // Extract word length
         let decryptedWord = '';
-        for (let char of word) {
+        for (let char of word.slice(0, -1)) {
           decryptedWord += caesarShiftChar(char, -shiftKey);
         }
-        decryptedText += decryptedWord.split('').reverse().join('') + ' ';
+        decryptedText += decryptedWord.slice(-length).split('').reverse().join('') + ' ';
       });
 
       document.getElementById('outputText').value = decryptedText.trim();
