@@ -91,7 +91,7 @@
     <p>Select a cipher:</p>
     <button class="btn" onclick="startCaesar()">Caesar Cipher</button>
     <button class="btn" onclick="startSigbin()">Sigbin Cipher</button>
-    <button class="btn" onclick="startPlayfair()">Playfair Cipher</button>
+    <button class="btn" onclick="startSigbinCaesar()">Sigbin Caesar Cipher</button>
   </div>
 
   <script>
@@ -163,35 +163,49 @@
       document.getElementById('outputText').value = decryptedText.trim();
     }
 
-    // Playfair Cipher Functions
-    function playfairEncrypt(text, key) {
-      // Replace J with I and clean text
-      text = text.toUpperCase().replace(/J/g, "I").replace(/\s+/g, "");
-      key = key.toUpperCase().replace(/J/g, "I");
-      return text.split('').reverse().join('') + '(PF)';
-    }
-
-    function playfairDecrypt(text, key) {
-      return text.replace('(PF)', '').split('').reverse().join('');
-    }
-
-    function encryptPlayfair() {
+    // Sigbin Caesar Cipher Functions (Caesar -> Sigbin -> Caesar)
+    function encryptSigbinCaesar() {
       const inputText = document.getElementById('inputText').value;
-      const playfairKey = document.getElementById('playfairKey').value;
+      const shiftKey = parseInt(document.getElementById('shiftKey').value);
+      let caesarEncrypted = '';
 
-      // Step 1: Apply Playfair Cipher (Alphabetic characters only)
-      const playfairEncrypted = playfairEncrypt(inputText, playfairKey);
+      // Step 1: Caesar Cipher Encryption
+      for (let char of inputText) {
+        caesarEncrypted += caesarShiftChar(char, shiftKey);
+      }
 
-      document.getElementById('outputText').value = playfairEncrypted;
+      // Step 2: Sigbin Cipher (Reverse the text)
+      let sigbinEncrypted = caesarEncrypted.split('').reverse().join('');
+
+      // Step 3: Apply Caesar Cipher again
+      let finalEncrypted = '';
+      for (let char of sigbinEncrypted) {
+        finalEncrypted += caesarShiftChar(char, shiftKey);
+      }
+
+      document.getElementById('outputText').value = finalEncrypted;
     }
 
-    function decryptPlayfair() {
+    function decryptSigbinCaesar() {
       const encryptedText = document.getElementById('outputText').value;
-      const playfairKey = document.getElementById('playfairKey').value;
+      const shiftKey = parseInt(document.getElementById('shiftKey').value);
+      let caesarDecrypted = '';
 
-      const playfairDecrypted = playfairDecrypt(encryptedText, playfairKey);
+      // Step 1: Reverse Caesar Cipher (apply negative shift)
+      for (let char of encryptedText) {
+        caesarDecrypted += caesarShiftChar(char, -shiftKey);
+      }
 
-      document.getElementById('outputText').value = playfairDecrypted;
+      // Step 2: Sigbin Decryption (Reverse the text again)
+      let sigbinDecrypted = caesarDecrypted.split('').reverse().join('');
+
+      // Step 3: Apply Caesar Cipher again (apply negative shift)
+      let finalDecrypted = '';
+      for (let char of sigbinDecrypted) {
+        finalDecrypted += caesarShiftChar(char, -shiftKey);
+      }
+
+      document.getElementById('outputText').value = finalDecrypted;
     }
 
     // Initialization for each cipher
@@ -231,17 +245,17 @@
       `;
     }
 
-    function startPlayfair() {
+    function startSigbinCaesar() {
       document.getElementById('mainContainer').innerHTML = `
-        <h1>Playfair Cipher</h1>
+        <h1>Sigbin Caesar Cipher</h1>
         <label for="inputText">Enter Text:</label>
         <textarea id="inputText" placeholder="Enter your text here..."></textarea>
 
-        <label for="playfairKey">Playfair Cipher Key:</label>
-        <input type="text" id="playfairKey" placeholder="Enter Playfair Key" />
+        <label for="shiftKey">Shift Key:</label>
+        <input type="number" id="shiftKey" value="3" />
 
-        <button class="btn" onclick="encryptPlayfair()">Encrypt</button>
-        <button class="btn" onclick="decryptPlayfair()">Decrypt</button>
+        <button class="btn" onclick="encryptSigbinCaesar()">Encrypt</button>
+        <button class="btn" onclick="decryptSigbinCaesar()">Decrypt</button>
         <button class="btn back" onclick="goBack()">Back to Selection</button>
 
         <h2>Result</h2>
@@ -255,7 +269,7 @@
         <p>Select a cipher:</p>
         <button class="btn" onclick="startCaesar()">Caesar Cipher</button>
         <button class="btn" onclick="startSigbin()">Sigbin Cipher</button>
-        <button class="btn" onclick="startPlayfair()">Playfair Cipher</button>
+        <button class="btn" onclick="startSigbinCaesar()">Sigbin Caesar Cipher</button>
       `;
     }
   </script>
