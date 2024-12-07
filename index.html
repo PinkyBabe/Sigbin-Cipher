@@ -112,15 +112,22 @@
       return text.split('').map(char => caesarShiftChar(char, -shift)).join('');
     }
 
-    // Sigbin Cipher functions (reverse the words)
+    // Sigbin Cipher functions (reverse the words and preserve word length, dot space between words)
     function sigbinEncrypt(text) {
       const words = text.split(' ');
-      return words.map(word => word.split('').reverse().join('')).join(' ');
+      return words.map(word => {
+        const wordLength = word.length;
+        const reversedWord = word.split('').reverse().join('');
+        return reversedWord + '.' + wordLength;
+      }).join(' ');
     }
 
     function sigbinDecrypt(text) {
       const words = text.split(' ');
-      return words.map(word => word.split('').reverse().join('')).join(' ');
+      return words.map(word => {
+        const [reversedWord, wordLength] = word.split('.');  // Split reversed word and length
+        return reversedWord.split('').reverse().join('');
+      }).join(' ');
     }
 
     // Sigbin Caesar Cipher functions (Caesar → Sigbin → Caesar)
@@ -128,7 +135,7 @@
       // Step 1: Caesar encryption
       const caesarEncrypted = caesarEncrypt(text, shift);
 
-      // Step 2: Sigbin encryption (reverse words)
+      // Step 2: Sigbin encryption (reverse words + word length)
       const sigbinEncrypted = sigbinEncrypt(caesarEncrypted);
 
       // Step 3: Caesar encryption again
@@ -139,7 +146,7 @@
       // Step 1: Reverse Caesar decryption
       const caesarDecrypted = caesarDecrypt(text, shift);
 
-      // Step 2: Sigbin decryption (reverse words)
+      // Step 2: Sigbin decryption (reverse words + word length)
       const sigbinDecrypted = sigbinDecrypt(caesarDecrypted);
 
       // Step 3: Reverse Caesar decryption again
