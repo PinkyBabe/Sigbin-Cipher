@@ -172,57 +172,64 @@
     }
 
     function encryptHard() {
-      const inputText = document.getElementById('inputText').value;
-      const shiftKey = parseInt(document.getElementById('shiftKey').value);
-      const playfairKey = document.getElementById('playfairKey').value;
+  const inputText = document.getElementById('inputText').value;
+  const shiftKey = parseInt(document.getElementById('shiftKey').value);
+  const playfairKey = document.getElementById('playfairKey').value;
 
-      let caesarEncrypted = '';
-      for (let char of inputText) {
-        caesarEncrypted += caesarShiftChar(char, shiftKey);
-      }
+  // Step 1: Caesar Cipher Encryption
+  let caesarEncrypted = '';
+  for (let char of inputText) {
+    caesarEncrypted += caesarShiftChar(char, shiftKey);
+  }
 
-      const playfairEncrypted = playfairEncrypt(caesarEncrypted, playfairKey);
+  // Step 2: Playfair Cipher Encryption
+  const playfairEncrypted = playfairEncrypt(caesarEncrypted, playfairKey);
 
-      let sigbinEncrypted = '';
-      const words = playfairEncrypted.split(' ');
-      words.forEach(word => {
-        const reversedWord = word.split('').reverse().join('');
-        let encryptedWord = '';
-        for (let char of reversedWord) {
-          encryptedWord += caesarShiftChar(char, shiftKey);
-        }
-        encryptedWord += reversedWord.length;
-        sigbinEncrypted += encryptedWord + '.';
-      });
-
-      document.getElementById('outputText').value = sigbinEncrypted.slice(0, -1);
+  // Step 3: Sigbin Cipher Encryption
+  let sigbinEncrypted = '';
+  const words = playfairEncrypted.split(' ');
+  words.forEach(word => {
+    const reversedWord = word.split('').reverse().join('');
+    let encryptedWord = '';
+    for (let char of reversedWord) {
+      encryptedWord += caesarShiftChar(char, shiftKey);
     }
+    encryptedWord += reversedWord.length;
+    sigbinEncrypted += encryptedWord + '.';
+  });
 
-    function decryptHard() {
-      const encryptedText = document.getElementById('outputText').value;
-      const shiftKey = parseInt(document.getElementById('shiftKey').value);
-      const playfairKey = document.getElementById('playfairKey').value;
+  document.getElementById('outputText').value = sigbinEncrypted.slice(0, -1);
+}
 
-      let sigbinDecrypted = '';
-      const words = encryptedText.split('.');
-      words.forEach(word => {
-        const length = parseInt(word.slice(-1));
-        let decryptedWord = '';
-        for (let char of word.slice(0, -1)) {
-          decryptedWord += caesarShiftChar(char, -shiftKey);
-        }
-        sigbinDecrypted += decryptedWord.slice(-length).split('').reverse().join('') + ' ';
-      });
+function decryptHard() {
+  const encryptedText = document.getElementById('outputText').value;
+  const shiftKey = parseInt(document.getElementById('shiftKey').value);
+  const playfairKey = document.getElementById('playfairKey').value;
 
-      const playfairDecrypted = playfairDecrypt(sigbinDecrypted.trim(), playfairKey);
-
-      let finalDecrypted = '';
-      for (let char of playfairDecrypted) {
-        finalDecrypted += caesarShiftChar(char, -shiftKey);
-      }
-
-      document.getElementById('outputText').value = finalDecrypted;
+  // Step 1: Sigbin Cipher Decryption
+  let sigbinDecrypted = '';
+  const words = encryptedText.split('.');
+  words.forEach(word => {
+    const length = parseInt(word.slice(-1));
+    let decryptedWord = '';
+    for (let char of word.slice(0, -1)) {
+      decryptedWord += caesarShiftChar(char, -shiftKey);
     }
+    sigbinDecrypted += decryptedWord.slice(-length).split('').reverse().join('') + ' ';
+  });
+
+  // Step 2: Playfair Cipher Decryption
+  const playfairDecrypted = playfairDecrypt(sigbinDecrypted.trim(), playfairKey);
+
+  // Step 3: Caesar Cipher Decryption
+  let finalDecrypted = '';
+  for (let char of playfairDecrypted) {
+    finalDecrypted += caesarShiftChar(char, -shiftKey);
+  }
+
+  document.getElementById('outputText').value = finalDecrypted;
+}
+
 
     // Hard Level Initialization
     function startHard() {
