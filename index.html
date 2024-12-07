@@ -191,7 +191,7 @@
   let alphaIndex = 0;
   const words = caesarEncrypted.split(' '); // Split by spaces to handle word structure
   words.forEach(word => {
-    const reversedWord = word.split('').reverse().join(''); // Reverse the word
+    const reversedWord = word.split('').reverse().join('');
     let encryptedWord = '';
     for (let char of reversedWord) {
       if (/[a-zA-Z]/.test(char)) {
@@ -206,6 +206,7 @@
 
   document.getElementById('outputText').value = sigbinEncrypted.slice(0, -1); // Remove trailing dot
 }
+
 
 function decryptHard() {
   const encryptedText = document.getElementById('outputText').value;
@@ -245,27 +246,29 @@ function decryptHard() {
   document.getElementById('outputText').value = finalDecrypted.trim();
 }
 
+
     // Hard Level Initialization
     function startHard() {
-      document.getElementById('mainContainer').innerHTML = `
-        <h1>Hard Encryption</h1>
-        <label for="inputText">Enter Text:</label>
-        <textarea id="inputText" placeholder="Enter your text here..."></textarea>
+  document.getElementById('mainContainer').innerHTML = `
+    <h1>Hard Encryption</h1>
+    <label for="inputText">Enter Text:</label>
+    <textarea id="inputText" placeholder="Enter your text here..."></textarea>
 
-        <label for="shiftKey">Caesar Cipher Shift Key:</label>
-        <input type="number" id="shiftKey" value="3" />
+    <label for="shiftKey">Caesar Cipher Shift Key:</label>
+    <input type="number" id="shiftKey" value="3" />
 
-        <label for="playfairKey">Playfair Cipher Key:</label>
-        <input type="text" id="playfairKey" placeholder="Enter Playfair Key" />
+    <label for="playfairKey">Playfair Cipher Key:</label>
+    <input type="text" id="playfairKey" placeholder="Enter Playfair Key" />
 
-        <button class="btn" onclick="encryptHard()">Encrypt</button>
-        <button class="btn" onclick="decryptHard()">Decrypt</button>
-        <button class="btn back" onclick="goBack()">Back to Selection</button>
+    <button class="btn" onclick="encryptHard()">Encrypt</button>
+    <button class="btn" onclick="decryptHard()">Decrypt</button>
+    <button class="btn back" onclick="goBack()">Back to Selection</button>
 
-        <h2>Result</h2>
-        <textarea id="outputText" readonly></textarea>
-      `;
-    }
+    <h2>Result</h2>
+    <textarea id="outputText" readonly></textarea>
+  `;
+}
+
 
     function goBack() {
       document.getElementById('mainContainer').innerHTML = `
