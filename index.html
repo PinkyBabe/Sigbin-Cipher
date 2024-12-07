@@ -182,32 +182,26 @@
     caesarEncrypted += caesarShiftChar(char, shiftKey);
   }
 
-  // Step 2: Playfair Cipher Encryption (only alphabetic characters)
-  const alphabetOnly = caesarEncrypted.replace(/[^a-zA-Z]/g, ''); // Remove non-alphabets for Playfair
+  // Step 2: Playfair Cipher Encryption (Alphabetic only)
+  const alphabetOnly = caesarEncrypted.replace(/[^a-zA-Z]/g, '');
   const playfairEncrypted = playfairEncrypt(alphabetOnly, playfairKey);
-
-  // Merge non-alphabetic characters back into their original positions
-  let playfairWithSymbols = '';
-  let alphaIndex = 0;
-  for (let char of caesarEncrypted) {
-    if (/[a-zA-Z]/.test(char)) {
-      playfairWithSymbols += playfairEncrypted[alphaIndex++];
-    } else {
-      playfairWithSymbols += char;
-    }
-  }
 
   // Step 3: Sigbin Cipher Encryption
   let sigbinEncrypted = '';
-  const words = playfairWithSymbols.split(' '); // Split into words
+  let alphaIndex = 0;
+  const words = caesarEncrypted.split(' '); // Split by spaces to handle word structure
   words.forEach(word => {
-    const reversedWord = word.split('').reverse().join(''); // Reverse word
+    const reversedWord = word.split('').reverse().join(''); // Reverse the word
     let encryptedWord = '';
     for (let char of reversedWord) {
-      encryptedWord += caesarShiftChar(char, shiftKey); // Caesar-shift each character
+      if (/[a-zA-Z]/.test(char)) {
+        encryptedWord += playfairEncrypted[alphaIndex++]; // Apply Playfair result for letters
+      } else {
+        encryptedWord += char; // Keep non-alphabetic characters as-is
+      }
     }
-    encryptedWord += reversedWord.length; // Append word length
-    sigbinEncrypted += encryptedWord + '.'; // Add dot separator
+    encryptedWord += reversedWord.length; // Append the word length
+    sigbinEncrypted += encryptedWord + '.';
   });
 
   document.getElementById('outputText').value = sigbinEncrypted.slice(0, -1); // Remove trailing dot
@@ -220,38 +214,35 @@ function decryptHard() {
 
   // Step 1: Sigbin Cipher Decryption
   let sigbinDecrypted = '';
-  const words = encryptedText.split('.'); // Split by dots
+  const words = encryptedText.split('.');
   words.forEach(word => {
     const length = parseInt(word.slice(-1)); // Extract word length
     let decryptedWord = '';
     for (let char of word.slice(0, -1)) {
       decryptedWord += caesarShiftChar(char, -shiftKey); // Reverse Caesar shift
     }
-    sigbinDecrypted += decryptedWord.slice(-length).split('').reverse().join('') + ' '; // Reverse word and trim
+    sigbinDecrypted += decryptedWord.slice(-length).split('').reverse().join('') + ' '; // Reverse and trim to word length
   });
 
-  // Step 2: Extract alphabet-only portion for Playfair Cipher Decryption
-  const alphabetOnly = sigbinDecrypted.replace(/[^a-zA-Z]/g, ''); // Remove non-alphabets for Playfair
+  // Step 2: Playfair Cipher Decryption (Alphabetic only)
+  const alphabetOnly = sigbinDecrypted.replace(/[^a-zA-Z]/g, '');
   const playfairDecrypted = playfairDecrypt(alphabetOnly, playfairKey);
 
-  // Merge non-alphabetic characters back into their original positions
-  let playfairWithSymbols = '';
+  // Step 3: Restore Original Case and Non-Alphabetic Characters
+  let finalDecrypted = '';
   let alphaIndex = 0;
-  for (let char of sigbinDecrypted) {
+  for (let i = 0; i < sigbinDecrypted.length; i++) {
+    const char = sigbinDecrypted[i];
     if (/[a-zA-Z]/.test(char)) {
-      playfairWithSymbols += playfairDecrypted[alphaIndex++];
+      let decryptedChar = playfairDecrypted[alphaIndex++];
+      decryptedChar = char === char.toLowerCase() ? decryptedChar.toLowerCase() : decryptedChar.toUpperCase(); // Apply original case
+      finalDecrypted += decryptedChar;
     } else {
-      playfairWithSymbols += char;
+      finalDecrypted += char; // Retain non-alphabetic characters
     }
   }
 
-  // Step 3: Caesar Cipher Decryption
-  let finalDecrypted = '';
-  for (let char of playfairWithSymbols) {
-    finalDecrypted += caesarShiftChar(char, -shiftKey);
-  }
-
-  document.getElementById('outputText').value = finalDecrypted;
+  document.getElementById('outputText').value = finalDecrypted.trim();
 }
 
     // Hard Level Initialization
