@@ -217,16 +217,17 @@
       selectedCipher = 'Caesar';
       document.getElementById('mainContainer').innerHTML = `
         <h1>Caesar Cipher</h1>
-        <label for="inputText">Enter Encrypted Text:</label>
-        <textarea id="inputText" placeholder="Enter encrypted text here..."></textarea>
+        <label for="inputText">Enter Text:</label>
+        <textarea id="inputText" placeholder="Enter text here..."></textarea>
 
         <label for="shiftKey">Shift Key:</label>
         <input type="number" id="shiftKey" value="3" />
 
+        <button class="btn" onclick="encryptCaesar()">Encrypt</button>
         <button class="btn" onclick="decryptCaesar()">Decrypt</button>
         <button class="btn back" onclick="goBack()">Back to Selection</button>
 
-        <h2>Decrypted Text</h2>
+        <h2>Result</h2>
         <textarea id="outputText" readonly></textarea>
       `;
     }
@@ -235,13 +236,14 @@
       selectedCipher = 'Sigbin';
       document.getElementById('mainContainer').innerHTML = `
         <h1>Sigbin Cipher</h1>
-        <label for="inputText">Enter Encrypted Text:</label>
-        <textarea id="inputText" placeholder="Enter encrypted text here..."></textarea>
+        <label for="inputText">Enter Text:</label>
+        <textarea id="inputText" placeholder="Enter text here..."></textarea>
 
+        <button class="btn" onclick="encryptSigbin()">Encrypt</button>
         <button class="btn" onclick="decryptSigbin()">Decrypt</button>
         <button class="btn back" onclick="goBack()">Back to Selection</button>
 
-        <h2>Decrypted Text</h2>
+        <h2>Result</h2>
         <textarea id="outputText" readonly></textarea>
       `;
     }
@@ -250,16 +252,17 @@
       selectedCipher = 'SigbinCaesar';
       document.getElementById('mainContainer').innerHTML = `
         <h1>Sigbin Caesar Cipher</h1>
-        <label for="inputText">Enter Encrypted Text:</label>
-        <textarea id="inputText" placeholder="Enter encrypted text here..."></textarea>
+        <label for="inputText">Enter Text:</label>
+        <textarea id="inputText" placeholder="Enter text here..."></textarea>
 
         <label for="shiftKey">Shift Key:</label>
         <input type="number" id="shiftKey" value="3" />
 
+        <button class="btn" onclick="encryptSigbinCaesar()">Encrypt</button>
         <button class="btn" onclick="decryptSigbinCaesar()">Decrypt</button>
         <button class="btn back" onclick="goBack()">Back to Selection</button>
 
-        <h2>Decrypted Text</h2>
+        <h2>Result</h2>
         <textarea id="outputText" readonly></textarea>
       `;
     }
