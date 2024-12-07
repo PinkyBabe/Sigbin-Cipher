@@ -182,12 +182,24 @@
     caesarEncrypted += caesarShiftChar(char, shiftKey);
   }
 
-  // Step 2: Playfair Cipher Encryption
-  const playfairEncrypted = playfairEncrypt(caesarEncrypted, playfairKey);
+  // Step 2: Playfair Cipher Encryption (only alphabetic characters)
+  const alphabetOnly = caesarEncrypted.replace(/[^a-zA-Z]/g, ''); // Remove non-alphabets for Playfair
+  const playfairEncrypted = playfairEncrypt(alphabetOnly, playfairKey);
+
+  // Merge non-alphabetic characters back into their original positions
+  let playfairWithSymbols = '';
+  let alphaIndex = 0;
+  for (let char of caesarEncrypted) {
+    if (/[a-zA-Z]/.test(char)) {
+      playfairWithSymbols += playfairEncrypted[alphaIndex++];
+    } else {
+      playfairWithSymbols += char;
+    }
+  }
 
   // Step 3: Sigbin Cipher Encryption
   let sigbinEncrypted = '';
-  const words = playfairEncrypted.split(' '); // Split into words
+  const words = playfairWithSymbols.split(' '); // Split into words
   words.forEach(word => {
     const reversedWord = word.split('').reverse().join(''); // Reverse word
     let encryptedWord = '';
@@ -218,18 +230,29 @@ function decryptHard() {
     sigbinDecrypted += decryptedWord.slice(-length).split('').reverse().join('') + ' '; // Reverse word and trim
   });
 
-  // Step 2: Playfair Cipher Decryption
-  const playfairDecrypted = playfairDecrypt(sigbinDecrypted.trim(), playfairKey);
+  // Step 2: Extract alphabet-only portion for Playfair Cipher Decryption
+  const alphabetOnly = sigbinDecrypted.replace(/[^a-zA-Z]/g, ''); // Remove non-alphabets for Playfair
+  const playfairDecrypted = playfairDecrypt(alphabetOnly, playfairKey);
+
+  // Merge non-alphabetic characters back into their original positions
+  let playfairWithSymbols = '';
+  let alphaIndex = 0;
+  for (let char of sigbinDecrypted) {
+    if (/[a-zA-Z]/.test(char)) {
+      playfairWithSymbols += playfairDecrypted[alphaIndex++];
+    } else {
+      playfairWithSymbols += char;
+    }
+  }
 
   // Step 3: Caesar Cipher Decryption
   let finalDecrypted = '';
-  for (let char of playfairDecrypted) {
+  for (let char of playfairWithSymbols) {
     finalDecrypted += caesarShiftChar(char, -shiftKey);
   }
 
   document.getElementById('outputText').value = finalDecrypted;
 }
-
 
     // Hard Level Initialization
     function startHard() {
